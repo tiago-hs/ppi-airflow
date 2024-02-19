@@ -12,6 +12,8 @@ python = "^3.11.6"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.1"
 pytest-cov = "^4.1.0"
+blue = "^0.9.1"
+isort = "^5.13.2"
 
 [build-system]
 requires = ["poetry-core"]
