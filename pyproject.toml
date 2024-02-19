@@ -26,6 +26,9 @@ mkdocstrings-python = "^1.8.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tooll.pytest.ini_options]
+[tool.pytest.ini_options]
 pythonpath = "."
 addopts = "--doctest-modules"
+[tool.isort]
+profile = "black"
+line_length = 79 
