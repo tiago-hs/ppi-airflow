@@ -59,6 +59,18 @@ cover/
 *.mo
 *.pot
 
+# Airflow stuff
+ppi_airflow/airflow/logs/
+airflow.db
+airflow.cfg
+unittests.cfg
+webserver_config.py
+standalone_admin_password.txt
+airflow-webserver.pid
+
+# VSCode
+.vscode
+*.code-workspace
 # Django stuff:
 *.log
 local_settings.py
