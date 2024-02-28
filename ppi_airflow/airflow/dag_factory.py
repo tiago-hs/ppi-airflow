@@ -1,22 +1,18 @@
 import os
-import sys
 import traceback
 from importlib import import_module
-from logging import info
 
-AIRFLOW_BASE = os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-)
-
-sys.path.append(AIRFLOW_BASE)
+from ppi_airflow.airflow.no_project_error import NoProjectsError
 
 
 class DAGFactory:
     """
     Classe responsável por criar e gerenciar Directed Acyclic Graphs (DAGs).
 
-    Encapsula funcionalidades relacionadas à obtenção de informações sobre projetos e seus DAGs,
-    bem como a importação dinâmica de módulos e a criação de variáveis globais para esses DAGs.
+    Encapsula funcionalidades relacionadas à obtenção de informações sobre projetos e
+    seus DAGs,
+    bem como a importação dinâmica de módulos e a criação de variáveis globais para
+    esses DAGs.
 
     Attributes:
         __project_base (str): O caminho base onde os projetos estão localizados.
@@ -33,8 +29,8 @@ class DAGFactory:
             o padrão 'projeto-numero_dag'.
     """
 
-    def __init__(self):
-        self.__project_base = os.path.join(AIRFLOW_BASE, 'ppi_airflow')
+    def __init__(self, AIRFLOW_BASE_PATH):
+        self.__project_base = AIRFLOW_BASE_PATH
 
     @property
     def projects(self) -> list[str]:
@@ -42,20 +38,21 @@ class DAGFactory:
         Itera recursivamente sobre o diretório base e o primeiro nível de
         seus subdiretórios.
 
+        Returns:
+            Uma lista de nomes dos subdiretórios contidos no primeiro nível do diretório base da instância da classe, excluindo o diretório __pycache__. Retornará uma lista vazia caso não existam projetos no diretório `dags`.
+
         Examples:
-            >>> factory = DAGFactory()
+            >>> from ppi_airflow.airflow.dag_factory import DAGFactory
+            >>> from ppi_airflow.airflow import AIRFLOW_BASE_PATH
+            >>> factory = DAGFactory(AIRFLOW_BASE_PATH)
             >>> isinstance(factory.projects, list)
             True
-            >>> len(factory.projects) > 0
-            True
-
-        Returns:
-            Uma lista de nomes dos subdiretórios contidos no primeiro nível do diretório base da instância da classe, excluindo o diretório __pycache__.
         """
+
         return list(
             filter(
                 lambda x: x not in ['__pycache__'],
-                [dirs for _, dirs, _ in os.walk(self.__project_base)][1],
+                [dirs for _, dirs, _ in os.walk(self.__project_base)][0],
             )
         )
 
@@ -69,11 +66,10 @@ class DAGFactory:
         no formato `projeto-numero_dag`. Uma exceção é levantada se o processo de
         importação ou criação das variáveis globais não for possível. O traceback
         da exceção será impresso, mas a execução continuará para os próximos projetos.
-
-        Examples:
-            >>> factory = DAGFactory()
-            >>> factory.get_modules_from_all_projects()
         """
+
+        if len(self.projects) == 0:
+            raise NoProjectsError
 
         for project_name in self.projects:
             try:
@@ -86,8 +82,12 @@ class DAGFactory:
 
                     globals()[var_name] = dag
 
-                    info(f'DAG {var_name} armazenada no namespace global.')
+                    print(f'INFO [DAGFactory] Projects: {self.projects}.')
+                    print(
+                        f'INFO [DAGFactory] DAG {var_name} in global namespace.'
+                    )
 
                     num_of_project_dags += 1
+
             except Exception:
                 print(traceback.format_exc())
