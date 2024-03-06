@@ -2,7 +2,7 @@ import os
 import traceback
 from importlib import import_module
 
-from ppi_airflow.airflow.no_project_error import NoProjectsError
+from no_project_error import NoProjectsError
 
 
 class DAGFactory:
@@ -73,11 +73,22 @@ class DAGFactory:
 
         for project_name in self.projects:
             try:
+                if not project_name:
+                    raise ModuleNotFoundError(
+                        f'Module {project_name} not found.'
+                    )
+
                 module_name = f'ppi_airflow.dags.{project_name}.DAG'
                 module = import_module(module_name)
                 num_of_project_dags = 1
 
                 for dag in module.DAGS:
+
+                    if not getattr(module, 'DAGS'):
+                        raise AttributeError(
+                            f'The module {module} no has attribute DAGS.'
+                        )
+
                     var_name = f'{project_name}-{num_of_project_dags}'
 
                     globals()[var_name] = dag

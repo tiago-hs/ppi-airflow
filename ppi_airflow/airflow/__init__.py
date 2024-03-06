@@ -1,8 +1,8 @@
 import os
 import sys
 
-from ppi_airflow.airflow.dag_factory import DAGFactory
-from ppi_airflow.airflow.no_project_error import NoProjectsError
+from dag_factory import DAGFactory
+from no_project_error import NoProjectsError
 
 BASE_PATH = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -11,7 +11,6 @@ BASE_PATH = os.path.dirname(
 AIRFLOW_BASE_PATH = os.path.join(BASE_PATH, 'ppi_airflow/dags')
 
 sys.path.append(AIRFLOW_BASE_PATH)
-
 
 dag_factory = DAGFactory(AIRFLOW_BASE_PATH)
 try:
