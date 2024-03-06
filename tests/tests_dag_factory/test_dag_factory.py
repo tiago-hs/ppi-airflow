@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 from pytest import fixture, mark, raises
 
@@ -23,6 +23,7 @@ def mock_projets():
 def mock_import_module(project):
     return f'ppi_airflow.dags{project}.DAG'
 
+
 @fixture
 def mock_dags_module():
     dag_1 = MagicMock()
@@ -31,8 +32,9 @@ def mock_dags_module():
     dag_2.DAGS = []
     return (dag_1, dag_2)
 
+
 # @mark.skip
-def test_deve_exibir_uma_messagem_de_erro_caso_nao_existam_projetos_a_serem_processados(
+def test_deve_levantar_NoProjectError_e_exibir_uma_messagem_de_erro_caso_nao_existam_projetos_a_serem_processados(
     dag_factory, mocker
 ):
     """
@@ -76,11 +78,30 @@ def test_deve_importar_os_modulos_corretamente(dag_factory, mocker):
         mocker.import_module.assert_has_calls([expected_calls])
 
 
-def test_deve_garantir_se_o_modulo_DAG_possui_atributo_DAGS_com_uma_lista_de_objetos(dag_factory):
-    """
-    Testa se o modulo DAG.py fornece um atributo DAGS.
-    """
-    pass
+@mark.skip
+def test_deve_garantir_se_o_modulo_DAG_possui_atributo_DAGS_com_uma_lista_de_objetos(
+    dag_factory, mocker
+):
+
+    mock_walk_return_existing_projets = [
+        (AIRFLOW_BASE_PATH, ['project_a', 'project_b'], [])
+    ]
+
+    mocker.patch('os.walk', return_value=mock_walk_return_existing_projets)
+
+    mock_dag = MagicMock()
+
+    mocker.patch(
+        'ppi_airflow.airflow.dag_factory.import_module',
+        return_value=MagicMock(DAGS=[mock_dag]),
+    )
+
+    dag_factory.get_modules_from_all_projects()
+
+    assert 'project_a-1' in globals()
+    assert globals()['project_a1-1'] == mock_dag
+    assert 'project_b-1' in globals()
+    assert globals()['project_b1-1'] == mock_dag
 
 
 def test_deve_garantir_que_o_atributo_dags_e_uma_lista_de_objetos_da_classe_dag(
