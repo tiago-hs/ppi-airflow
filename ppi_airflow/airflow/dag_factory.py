@@ -2,7 +2,7 @@ import os
 import traceback
 from importlib import import_module
 
-from .no_project_error import NoProjectsError
+from ppi_airflow.core.errors.no_project_error import NoProjectsError
 
 
 class DAGFactory:

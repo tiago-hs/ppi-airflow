@@ -2,7 +2,7 @@ import os
 import sys
 
 from ppi_airflow.airflow.dag_factory import DAGFactory
-from ppi_airflow.airflow.no_project_error import NoProjectsError
+from ppi_airflow.core.errors.no_project_error import NoProjectsError
 
 BASE_PATH = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
