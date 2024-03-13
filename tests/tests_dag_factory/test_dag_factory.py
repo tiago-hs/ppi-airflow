@@ -4,7 +4,7 @@ from pytest import fixture, mark, raises
 
 from ppi_airflow.airflow import AIRFLOW_BASE_PATH
 from ppi_airflow.airflow.dag_factory import DAGFactory
-from ppi_airflow.airflow.no_project_error import NoProjectsError
+from ppi_airflow.core.errors.no_project_error import NoProjectsError
 
 
 @fixture
