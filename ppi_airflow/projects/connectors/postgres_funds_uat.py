@@ -4,14 +4,14 @@ from ppi_airflow.core.services.builder import ServiceBuilder
 from ppi_airflow.core.services.service import Service
 
 
-class PostgresServiceBuilder(ServiceBuilder):
+class PostgresFundsUATBuilder(ServiceBuilder):
     def __call__(self, config, **_ignored):
         if not self._service:
-            self._service = PostgresConnectionService(config)
+            self._service = PostgresFundsUATConnectionService(config)
             return self._service
 
 
-class PostgresConnectionService(Service):
+class PostgresFundsUATConnectionService(Service):
     def __init__(self, config):
         if not isinstance(config, dict):
             raise TypeError(
@@ -28,6 +28,7 @@ class PostgresConnectionService(Service):
                 database=self._config['DB_NAME'],
                 user=self._config['DB_USER'],
                 password=self._config['DB_PASS'],
+                port=self._config['DB_PORT'],
             )
         except psycopg2.OperationalError as e:
             raise ConnectionError(f'Failed to connect to PostgreSQL: {e}')
